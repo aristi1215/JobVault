@@ -2,7 +2,7 @@
 
 Privacy-first job application tracker focused on reducing uncertainty after applying.
 
-Repository: **JobVault** on GitHub.
+GitHub: https://github.com/aristi1215/JobVault
 
 ## Monorepo layout
 
