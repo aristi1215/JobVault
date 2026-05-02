@@ -45,7 +45,7 @@ async function route(request: Request): Promise<Response> {
   const url = new URL(request.url);
 
   if (request.method === "OPTIONS") {
-    return corsHeaders(jsonResponse(204, null));
+    return corsHeaders(new Response(null, { status: 204 }));
   }
 
   try {
