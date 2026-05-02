@@ -46,6 +46,10 @@ class InMemoryStore {
       .sort((a, b) => b.lastEventAt.localeCompare(a.lastEventAt));
   }
 
+  public removeApplication(userId: string, appId: string): void {
+    this.applications.delete(`${userId}:${appId}`);
+  }
+
   public updateStatus(userId: string, appId: string, status: ApplicationStatus): Application | null {
     const key = `${userId}:${appId}`;
     const app = this.applications.get(key);

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Job Tracker Capture",
-  "version": "0.1.0",
-  "description": "Capture role/company metadata from job boards into Job Application Tracker.",
+  "name": "JobVault Capture",
+  "version": "0.2.0",
+  "description": "Automatically capture job applications from LinkedIn, Indeed, and Glassdoor into JobVault.",
   "permissions": [
     "activeTab",
     "storage"
@@ -10,11 +10,12 @@
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://www.indeed.com/*",
-    "https://www.glassdoor.com/*"
+    "https://www.glassdoor.com/*",
+    "http://localhost:4100/*"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Capture Job Application"
+    "default_title": "JobVault — Capture Job"
   },
   "content_scripts": [
     {

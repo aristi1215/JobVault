@@ -1,14 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f9f8;
+  --background: #f7f9fb;
   --surface: #ffffff;
-  --foreground: #11201f;
-  --muted: #48605d;
-  --brand: #2f6f68;
-  --brand-soft: #d8ece8;
-  --warning-soft: #f0e8d7;
-  --border: #d6e2df;
+  --foreground: #0f1729;
+  --muted: #5f6b7a;
+  --brand: #2563eb;
+  --brand-hover: #1d4ed8;
+  --brand-soft: #eff6ff;
+  --success: #16a34a;
+  --success-soft: #f0fdf4;
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --border: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --input-bg: #ffffff;
+  --sidebar-bg: #f8fafc;
 }
 
 @theme inline {
@@ -21,9 +30,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
 }
 
 .headline {
   font-family: var(--font-display), serif;
+}
+
+input, select, textarea {
+  font-size: 0.875rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: -1px;
 }

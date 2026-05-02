@@ -3,17 +3,70 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Job Tracker Capture</title>
+    <title>JobVault Capture</title>
     <style>
-      body { font-family: sans-serif; min-width: 280px; padding: 12px; }
-      button { width: 100%; border: 0; background: #205952; color: white; padding: 10px; border-radius: 10px; }
-      pre { white-space: pre-wrap; background: #f2f5f4; padding: 8px; border-radius: 8px; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-width: 320px; padding: 16px; background: #f7f9fb; color: #0f1729; }
+      .logo { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+      .card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+      label { display: block; font-size: 11px; font-weight: 600; color: #5f6b7a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+      input, select { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 10px; background: #fff; }
+      input:focus, select:focus { outline: 2px solid #2563eb; outline-offset: -1px; }
+      .btn { width: 100%; border: 0; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+      .btn:hover { opacity: 0.9; }
+      .btn-primary { background: #2563eb; color: white; }
+      .btn-secondary { background: #e2e8f0; color: #0f1729; margin-top: 8px; }
+      .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .status { font-size: 12px; text-align: center; padding: 8px; border-radius: 8px; margin-top: 8px; }
+      .status-success { background: #f0fdf4; color: #16a34a; }
+      .status-error { background: #fef2f2; color: #dc2626; }
+      .auth-section { margin-bottom: 12px; }
+      .auth-link { font-size: 12px; color: #2563eb; cursor: pointer; text-decoration: underline; }
+      .logged-in { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #5f6b7a; }
+      .logged-in button { background: none; border: none; color: #2563eb; cursor: pointer; font-size: 12px; }
     </style>
   </head>
   <body>
-    <h3>Capture preview</h3>
-    <pre id="payload">Loading...</pre>
-    <button id="save">Save for manual review</button>
+    <div class="logo">JobVault</div>
+
+    <div id="auth-needed" class="card" style="display:none;">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" />
+      <label>Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" />
+      <button class="btn btn-primary" id="login-btn">Sign in</button>
+      <div id="auth-status"></div>
+    </div>
+
+    <div id="auth-ok" class="logged-in" style="display:none;">
+      <span id="user-label"></span>
+      <button id="logout-btn">Log out</button>
+    </div>
+
+    <div class="card">
+      <label>Company</label>
+      <input type="text" id="company" placeholder="Company name" />
+      <label>Role</label>
+      <input type="text" id="role" placeholder="Job title" />
+      <label>Channel</label>
+      <select id="channel">
+        <option>LinkedIn</option>
+        <option>Indeed</option>
+        <option>Glassdoor</option>
+        <option>Company Portal</option>
+        <option>Email</option>
+        <option>Referral</option>
+        <option>Other</option>
+      </select>
+      <label>Job URL</label>
+      <input type="text" id="sourceUrl" placeholder="https://..." readonly />
+    </div>
+
+    <button class="btn btn-primary" id="save-btn" disabled>Save to JobVault</button>
+    <button class="btn btn-secondary" id="clear-btn">Clear</button>
+
+    <div id="save-status" class="status" style="display:none;"></div>
+
     <script src="src/popup.js"></script>
   </body>
-  </html>
+</html>

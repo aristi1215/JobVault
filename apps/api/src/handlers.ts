@@ -133,6 +133,22 @@ export function deleteAccount(userId: string) {
   };
 }
 
+export function updateApplicationStatus(userId: string, appId: string, payload: unknown) {
+  const schema = z.object({ status: z.enum(["applied", "acknowledged", "screening", "interview", "decision", "silent", "closed"]) });
+  const parsed = schema.parse(payload);
+  const updated = store.updateStatus(userId, appId, parsed.status);
+  if (!updated) throw new Error("Application not found.");
+  return updated;
+}
+
+export function deleteApplication(userId: string, appId: string) {
+  const apps = store.listApplications(userId);
+  const app = apps.find((a) => a.appId === appId);
+  if (!app) throw new Error("Application not found.");
+  store.removeApplication(userId, appId);
+  return { deleted: true, appId };
+}
+
 export function connectOAuth(payload: unknown) {
   const parsed = providerSchema.parse(payload);
   return connectProvider(parsed.userId, parsed.provider);
