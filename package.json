@@ -1,0 +1,25 @@
+{
+  "name": "jobvault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy-first tracker for job application observability and bounded follow-up",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "infra"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w web",
+    "dev:api": "npm run dev -w api",
+    "build": "npm run build -w web && npm run build -w api",
+    "lint": "npm run lint -w web && npm run lint -w api",
+    "test": "npm run test -w api",
+    "cdk:synth": "npm run synth -w infra",
+    "cdk:deploy:dev": "npm run deploy:dev -w infra",
+    "cdk:deploy:staging": "npm run deploy:staging -w infra"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Job Tracker Capture",
+  "version": "0.1.0",
+  "description": "Capture role/company metadata from job boards into Job Application Tracker.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://www.indeed.com/*",
+    "https://www.glassdoor.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Capture Job Application"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*",
+        "https://www.indeed.com/*",
+        "https://www.glassdoor.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+.DS_Store
+.cursor
+
+node_modules
+dist
+build
+.next
+coverage
+*.log
+.env
+.env.*
+cdk.out
+out
+tmp
