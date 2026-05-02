@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useSyncExternalStore, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { api, type AuthResponse } from "./api";
 
 interface User {
@@ -24,10 +24,7 @@ function saveSession(res: AuthResponse) {
   localStorage.setItem("jv_user", JSON.stringify(res.user));
 }
 
-let listeners: Array<() => void> = [];
-function emitAuthChange() { listeners.forEach((l) => l()); }
-function subscribeAuth(cb: () => void) { listeners.push(cb); return () => { listeners = listeners.filter((l) => l !== cb); }; }
-function getStoredUser(): User | null {
+function readStoredUser(): User | null {
   if (typeof window === "undefined") return null;
   const stored = localStorage.getItem("jv_user");
   const token = localStorage.getItem("jv_token");
@@ -36,29 +33,25 @@ function getStoredUser(): User | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const storedUser = useSyncExternalStore(subscribeAuth, getStoredUser, () => null);
-  const [user, setUser] = useState<User | null>(storedUser);
+  const [user, setUser] = useState<User | null>(() => readStoredUser());
   const loading = false;
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await api.login(email, password);
     saveSession(res);
     setUser(res.user);
-    emitAuthChange();
   }, []);
 
   const register = useCallback(async (email: string, password: string, name: string) => {
     const res = await api.register(email, password, name);
     saveSession(res);
     setUser(res.user);
-    emitAuthChange();
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem("jv_token");
     localStorage.removeItem("jv_user");
     setUser(null);
-    emitAuthChange();
   }, []);
 
   return (
