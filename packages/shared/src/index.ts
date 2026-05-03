@@ -4,6 +4,7 @@ export const applicationStatuses = [
   "screening",
   "interview",
   "decision",
+  "rejected",
   "silent",
   "closed",
 ] as const;
@@ -31,6 +32,9 @@ export interface Application {
   appliedAt: string;
   status: ApplicationStatus;
   sourceUrl?: string;
+  jobDescription?: string;
+  recruiterEmails: string[];
+  matchScore?: JobMatchScore;
   lastEventAt: string;
   notes?: string;
   followupsSent: number;
@@ -48,13 +52,26 @@ export interface AllowlistRule {
 export interface EmailIngestion {
   ingestionId: string;
   userId: string;
-  provider: "gmail" | "outlook" | "alias";
+  provider: "gmail" | "outlook" | "alias" | "extension";
+  messageId?: string;
   sender: string;
   subject: string;
   receivedAt: string;
   status: "pending" | "parsed" | "needs_confirmation" | "discarded_not_allowlisted" | "discarded_low_confidence" | "failed";
   confidence?: number;
+  classification?: "applied" | "interview" | "rejected" | "follow_up" | "other";
+  extractedCompany?: string;
+  extractedRole?: string;
+  recruiterEmail?: string;
   parsedAppId?: string;
+}
+
+export interface JobMatchScore {
+  score: number;
+  missingSkills: string[];
+  strengths: string[];
+  provider: "deterministic" | "llm" | "llm_stub";
+  createdAt: string;
 }
 
 export interface FollowupDraft {

@@ -1,18 +1,25 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import {
   addAllowlistRule,
+  captureFromExtension,
   connectOAuth,
   createApplication,
   deleteAccount,
   exportUserData,
   generateFollowup,
+  generateMatchScore,
+  getInsights,
   ingestEmail,
   listAllowlist,
   listApplications,
+  listEmails,
+  listExtensionCaptures,
   listFollowups,
   listIngestionLog,
   listOAuthConnections,
+  listTimeline,
   revokeOAuth,
+  syncOAuth,
 } from "./handlers.js";
 
 const port = Number(process.env.PORT ?? 4100);
@@ -67,6 +74,33 @@ async function route(request: Request): Promise<Response> {
       return jsonResponse(201, generateFollowup({ ...body, userId: defaultUserId }));
     }
 
+    if (url.pathname === "/emails" && request.method === "GET") {
+      return jsonResponse(200, listEmails(defaultUserId, url.searchParams.get("appId") ?? undefined));
+    }
+
+    if (url.pathname.startsWith("/applications/") && url.pathname.endsWith("/timeline") && request.method === "GET") {
+      const appId = url.pathname.split("/")[2];
+      return jsonResponse(200, listTimeline(defaultUserId, appId));
+    }
+
+    if (url.pathname === "/extension/captures" && request.method === "GET") {
+      return jsonResponse(200, listExtensionCaptures(defaultUserId));
+    }
+
+    if (url.pathname === "/extension/captures" && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(201, captureFromExtension({ ...body, userId: defaultUserId }));
+    }
+
+    if (url.pathname === "/match-score" && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(201, await generateMatchScore({ ...body, userId: defaultUserId }));
+    }
+
+    if (url.pathname === "/insights" && request.method === "GET") {
+      return jsonResponse(200, getInsights(defaultUserId));
+    }
+
     if (url.pathname === "/privacy/export" && request.method === "GET") {
       return jsonResponse(200, exportUserData(defaultUserId));
     }
@@ -82,6 +116,11 @@ async function route(request: Request): Promise<Response> {
     if (url.pathname === "/oauth/connect" && request.method === "POST") {
       const body = await request.json();
       return jsonResponse(201, connectOAuth({ ...body, userId: defaultUserId }));
+    }
+
+    if (url.pathname === "/oauth/sync" && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(202, await syncOAuth({ ...body, userId: defaultUserId }));
     }
 
     if (url.pathname === "/oauth/revoke" && request.method === "POST") {

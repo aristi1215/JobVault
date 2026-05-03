@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { store } from "./domain/store.js";
+import { captureExtensionJob, ingestEmailWithAutomation, scoreApplicationMatch, syncConnectedProvider } from "./domain/automation.js";
+import { getProviderConfigStatus } from "./domain/email-providers.js";
 import { buildFollowupDraft, isFollowupAllowed } from "./domain/followup.js";
-import { parseEmailMessage } from "./domain/parser.js";
 import { connectProvider, listConnections, revokeConnection } from "./domain/oauth.js";
 
 const createApplicationSchema = z.object({
@@ -11,6 +12,7 @@ const createApplicationSchema = z.object({
   channel: z.string().min(1),
   appliedAt: z.string().min(1),
   sourceUrl: z.string().url().optional(),
+  jobDescription: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -23,9 +25,11 @@ const addAllowlistSchema = z.object({
 const ingestSchema = z.object({
   userId: z.string().min(1),
   provider: z.enum(["gmail", "outlook", "alias"]),
+  messageId: z.string().optional(),
   sender: z.string().email(),
   subject: z.string().min(1),
   body: z.string().min(1),
+  receivedAt: z.string().min(1).optional(),
 });
 
 const draftSchema = z.object({
@@ -38,6 +42,25 @@ const draftSchema = z.object({
 const providerSchema = z.object({
   userId: z.string().min(1),
   provider: z.enum(["gmail", "outlook"]),
+});
+
+const syncProviderSchema = providerSchema.extend({
+  historicalImportMonths: z.number().int().min(1).max(6).default(6),
+});
+
+const extensionCaptureSchema = z.object({
+  userId: z.string().min(1),
+  title: z.string().min(1),
+  company: z.string().min(1),
+  description: z.string().min(1),
+  sourceUrl: z.string().url().optional(),
+  capturedAt: z.string().min(1).optional(),
+});
+
+const matchScoreSchema = z.object({
+  userId: z.string().min(1),
+  appId: z.string().min(1),
+  cvText: z.string().min(1),
 });
 
 export function createApplication(payload: unknown) {
@@ -67,21 +90,13 @@ export function ingestEmail(payload: unknown) {
       provider: parsed.provider,
       sender: parsed.sender,
       subject: parsed.subject,
-      receivedAt: new Date().toISOString(),
+      messageId: parsed.messageId,
+      receivedAt: parsed.receivedAt ?? new Date().toISOString(),
       status: "discarded_not_allowlisted",
     });
   }
 
-  const parse = parseEmailMessage(parsed.sender, parsed.subject, parsed.body);
-  return store.createIngestion({
-    userId: parsed.userId,
-    provider: parsed.provider,
-    sender: parsed.sender,
-    subject: parsed.subject,
-    receivedAt: new Date().toISOString(),
-    status: parse.status,
-    confidence: parse.confidence,
-  });
+  return ingestEmailWithAutomation(parsed);
 }
 
 export function generateFollowup(payload: unknown) {
@@ -116,12 +131,41 @@ export function listFollowups(userId: string) {
   return store.listFollowups(userId);
 }
 
+export function listEmails(userId: string, appId?: string) {
+  return store.listStoredEmails(userId, appId);
+}
+
+export function listTimeline(userId: string, appId: string) {
+  return store.listTimeline(userId, appId);
+}
+
+export function captureFromExtension(payload: unknown) {
+  const parsed = extensionCaptureSchema.parse(payload);
+  return captureExtensionJob(parsed);
+}
+
+export function listExtensionCaptures(userId: string) {
+  return store.listExtensionCaptures(userId);
+}
+
+export async function generateMatchScore(payload: unknown) {
+  const parsed = matchScoreSchema.parse(payload);
+  return scoreApplicationMatch(parsed.userId, parsed.appId, parsed.cvText);
+}
+
+export function getInsights(userId: string) {
+  return store.buildInsights(userId);
+}
+
 export function exportUserData(userId: string) {
   return {
     exportedAt: new Date().toISOString(),
     applications: store.listApplications(userId),
     allowlist: store.listAllowlistRules(userId),
     ingestions: store.listIngestions(userId),
+    emails: store.listStoredEmails(userId),
+    extensionCaptures: store.listExtensionCaptures(userId),
+    insights: store.buildInsights(userId),
     followups: store.listFollowups(userId),
   };
 }
@@ -139,7 +183,15 @@ export function connectOAuth(payload: unknown) {
 }
 
 export function listOAuthConnections(userId: string) {
-  return listConnections(userId);
+  return {
+    connections: listConnections(userId),
+    providers: getProviderConfigStatus(),
+  };
+}
+
+export async function syncOAuth(payload: unknown) {
+  const parsed = syncProviderSchema.parse(payload);
+  return syncConnectedProvider(parsed.userId, parsed.provider, parsed.historicalImportMonths);
 }
 
 export function revokeOAuth(payload: unknown) {

@@ -25,7 +25,7 @@ export function routeInboundMail(record: InboundMailRecord) {
     accepted: true,
     aliasToken,
     queueMessage: {
-      provider: "alias",
+      provider: "alias" as const,
       sender: record.sender,
       subject: record.subject,
       body: record.bodyPreview,

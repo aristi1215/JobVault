@@ -16,5 +16,7 @@ export function processParserMessage(message: QueueMessage) {
     confidence: parsed.confidence,
     status: parsed.status,
     eventType: parsed.eventType,
+    classification: parsed.classification,
+    extracted: parsed.extracted,
   };
 }
