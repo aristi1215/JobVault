@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Newsreader } from "next/font/google";
+import { AuthProvider } from "@/lib/auth-context";
 import "./globals.css";
 
 const display = Newsreader({
@@ -15,8 +16,8 @@ const body = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Job Application Tracker",
-  description: "Track applications, reduce uncertainty, and follow up responsibly.",
+  title: "JobVault",
+  description: "Privacy-first job application tracker. Track, manage, and follow up on your applications.",
 };
 
 export default function RootLayout({
@@ -26,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
