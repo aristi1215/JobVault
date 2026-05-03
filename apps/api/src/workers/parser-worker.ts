@@ -1,20 +1,16 @@
-import { parseEmailMessage } from "../domain/parser.js";
+import { ingestEmail } from "../handlers.js";
 
 interface QueueMessage {
   userId: string;
+  provider: "gmail" | "outlook" | "alias";
+  messageId?: string;
   sender: string;
   subject: string;
   body: string;
+  receivedAt?: string;
+  rawEmailRef?: string;
 }
 
 export function processParserMessage(message: QueueMessage) {
-  const parsed = parseEmailMessage(message.sender, message.subject, message.body);
-
-  return {
-    userId: message.userId,
-    parser: parsed.parser,
-    confidence: parsed.confidence,
-    status: parsed.status,
-    eventType: parsed.eventType,
-  };
+  return ingestEmail(message);
 }
