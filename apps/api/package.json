@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/local-server.js",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx src/tests/parser.test.ts"
+    "test": "tsx src/tests/parser.test.ts",
+    "test:demo": "tsx src/tests/automation-demo.test.ts"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7",
