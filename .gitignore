@@ -9,6 +9,8 @@ coverage
 *.log
 .env
 .env.*
+.env.example
+**/.env.example
 cdk.out
 out
 tmp
