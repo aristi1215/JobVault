@@ -3,6 +3,8 @@ interface InboundMailRecord {
   sender: string;
   subject: string;
   bodyPreview: string;
+  messageId?: string;
+  receivedAt?: string;
   s3Key: string;
 }
 
@@ -26,10 +28,12 @@ export function routeInboundMail(record: InboundMailRecord) {
     aliasToken,
     queueMessage: {
       provider: "alias",
+      messageId: record.messageId,
       sender: record.sender,
       subject: record.subject,
       body: record.bodyPreview,
-      rawS3Key: record.s3Key,
+      receivedAt: record.receivedAt,
+      rawEmailRef: record.s3Key,
     },
   };
 }

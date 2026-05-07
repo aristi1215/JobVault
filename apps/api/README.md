@@ -18,8 +18,15 @@ Local Lambda-style API simulation for:
 - `GET /oauth`
 - `POST /oauth/connect`
 - `POST /oauth/revoke`
+- `POST /oauth/sync`
+- `POST /extension/captures`
+- `GET /applications/:appId/timeline`
+- `POST /applications/:appId/match-score`
+- `GET /insights`
 - `GET /privacy/export`
 - `POST /privacy/delete`
+
+See `../../docs/automated-intelligence-backend.md` for the production service map, credentials, and which integrations are currently stubbed.
 
 ## Run
 

@@ -1,11 +1,15 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import {
   addAllowlistRule,
+  captureFromExtension,
   connectOAuth,
   createApplication,
   deleteAccount,
+  deleteApplication,
   exportUserData,
   generateFollowup,
+  getApplicationTimeline,
+  getInsights,
   ingestEmail,
   listAllowlist,
   listApplications,
@@ -13,8 +17,9 @@ import {
   listIngestionLog,
   listOAuthConnections,
   revokeOAuth,
+  scoreApplicationMatch,
+  syncOAuthProvider,
   updateApplicationStatus,
-  deleteApplication,
 } from "./handlers.js";
 import { loginUser, registerUser, verifyToken } from "./domain/auth.js";
 
@@ -89,6 +94,17 @@ async function route(request: Request): Promise<Response> {
       return jsonResponse(200, deleteApplication(userId, appMatch[1]));
     }
 
+    const timelineMatch = url.pathname.match(/^\/applications\/([^/]+)\/timeline$/);
+    if (timelineMatch && request.method === "GET") {
+      return jsonResponse(200, getApplicationTimeline(userId, timelineMatch[1]));
+    }
+
+    const matchScoreMatch = url.pathname.match(/^\/applications\/([^/]+)\/match-score$/);
+    if (matchScoreMatch && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(200, scoreApplicationMatch({ ...body, appId: matchScoreMatch[1], userId }));
+    }
+
     if (url.pathname === "/allowlist" && request.method === "GET") {
       return jsonResponse(200, listAllowlist(userId));
     }
@@ -136,6 +152,20 @@ async function route(request: Request): Promise<Response> {
     if (url.pathname === "/oauth/revoke" && request.method === "POST") {
       const body = await request.json();
       return jsonResponse(200, revokeOAuth({ ...body, userId }));
+    }
+
+    if (url.pathname === "/oauth/sync" && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(202, syncOAuthProvider({ ...body, userId }));
+    }
+
+    if (url.pathname === "/extension/captures" && request.method === "POST") {
+      const body = await request.json();
+      return jsonResponse(201, captureFromExtension({ ...body, userId }));
+    }
+
+    if (url.pathname === "/insights" && request.method === "GET") {
+      return jsonResponse(200, getInsights(userId));
     }
 
     return jsonResponse(404, { message: "Not found" });

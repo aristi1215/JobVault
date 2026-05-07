@@ -16,7 +16,8 @@
     "test": "npm run test -w api",
     "cdk:synth": "npm run synth -w infra",
     "cdk:deploy:dev": "npm run deploy:dev -w infra",
-    "cdk:deploy:staging": "npm run deploy:staging -w infra"
+    "cdk:deploy:staging": "npm run deploy:staging -w infra",
+    "vercel:web": "npx --yes vercel@latest --cwd apps/web"
   },
   "engines": {
     "node": ">=20"
